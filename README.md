@@ -2,7 +2,7 @@
 
 此项目基于https://github.com/alphacep/vosk-android-demo实现。
 
-为了验证对音频识别的准确度，可以讲包含音频文件的文件加放置在外部存储的files目录下（/storage/emulated/0/Android/data/org.vosk.demo/files/）。
+为了验证对音频识别的准确度，可以将包含音频文件的文件加放置在外部存储的files目录下（/storage/emulated/0/Android/data/org.vosk.demo/files/）。
 
 点击Recognize File将自动逐条对音频进行准确度以及速度进行分析，分析结果保存在recognition_logs/recognition_log.txt
 
