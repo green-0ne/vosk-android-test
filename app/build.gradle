@@ -32,9 +32,3 @@ dependencies {
     implementation 'com.alphacephei:vosk-android:0.3.47@aar'
     implementation project(':models')
 }
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-    }
-}
