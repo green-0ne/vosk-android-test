@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
-    <Button
-        android:id="@+id/recognize_file"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/recognize_file"/>
+    android:padding="16dp"
+    android:background="@android:color/background_light">
 
     <Button
         android:id="@+id/recognize_mic"
@@ -23,12 +19,34 @@
         android:textOff="@string/pause"
         android:textOn="@string/continueRecognition"/>
 
-    <TextView
-        android:id="@+id/result_text"
-        android:layout_width="fill_parent"
+    <!-- Box Container for Speech Output -->
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
+        android:layout_marginTop="16dp"
+        android:padding="8dp"
+        android:background="@android:color/white"
         android:scrollbars="vertical"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:elevation="4dp">
 
+        <TextView
+            android:id="@+id/result_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:background="@drawable/border_box"
+            android:textColor="@android:color/black"
+            android:gravity="start|top"
+            android:minHeight="150dp"/>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:layout_gravity="bottom|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"/>
 </LinearLayout>
