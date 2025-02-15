@@ -19,7 +19,7 @@
         android:textOff="@string/pause"
         android:textOn="@string/continueRecognition"/>
 
-    <!-- Box Container for Speech Output -->
+    <!-- Box for displaying recognized text -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,11 +35,18 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/border_box"
             android:textColor="@android:color/black"
             android:gravity="start|top"
             android:minHeight="150dp"/>
     </ScrollView>
+
+    <!-- Send Button (Initially Hidden) -->
+    <Button
+        android:id="@+id/send_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/settings_button"

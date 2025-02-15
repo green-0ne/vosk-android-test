@@ -22,6 +22,14 @@ import java.io.IOException;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import android.view.View;
+import android.widget.Toast;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -51,10 +59,16 @@ public class VoskActivity extends Activity implements RecognitionListener {
         resultView = findViewById(R.id.result_text);
         resultView.setMovementMethod(new ScrollingMovementMethod()); // Allow scrolling
 
+        Button sendButton = findViewById(R.id.send_button);
+        sendButton.setVisibility(View.GONE); // Hide initially
+
         setUiState(STATE_START);
 
         // Microphone recognition button
         findViewById(R.id.recognize_mic).setOnClickListener(view -> recognizeMicrophone());
+
+        // Send button - Click to send text
+        sendButton.setOnClickListener(view -> sendTextToWebhook(resultView.getText().toString()));
 
         // Pause toggle
         ((ToggleButton) findViewById(R.id.pause)).setOnCheckedChangeListener((view, isChecked) -> pause(isChecked));
@@ -75,6 +89,7 @@ public class VoskActivity extends Activity implements RecognitionListener {
             initModel();
         }
     }
+
 
     private void initModel() {
         StorageService.unpack(this, "model-en-us", "model",
@@ -152,9 +167,22 @@ public class VoskActivity extends Activity implements RecognitionListener {
     public void onFinalResult(String hypothesis) {
         if (currentState == STATE_MIC) {
             setUiState(STATE_DONE);
-            resultView.append("\n[onFinalResult]\n" + hypothesis);
+            try {
+                JSONObject json = new JSONObject(hypothesis);
+                String finalText = json.optString("text", "");
+
+                if (!finalText.isEmpty()) {
+                    resultView.setText(finalText); // Display final text
+
+                    // Show the Send button after recognition is complete
+                    findViewById(R.id.send_button).setVisibility(View.VISIBLE);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     @Override
     public void onPartialResult(String hypothesis) {
@@ -219,4 +247,46 @@ public class VoskActivity extends Activity implements RecognitionListener {
         resultView.setText(message);
         findViewById(R.id.recognize_mic).setEnabled(false);
     }
+
+    private void sendTextToWebhook(String text) {
+        new Thread(() -> {
+            try {
+                // Webhook URL
+                URL url = new URL("https://n8n.g1-infosec.com/webhook/52c79d0b-7b00-49ae-9e4f-82eb3d492f0e");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+                // Set up the connection properties
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setDoOutput(true);
+
+                // Create JSON payload
+                JSONObject jsonPayload = new JSONObject();
+                jsonPayload.put("recognized_text", text);
+
+                // Send JSON data
+                try (OutputStream os = connection.getOutputStream()) {
+                    byte[] input = jsonPayload.toString().getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+
+                // Get the response code
+                int responseCode = connection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Text sent successfully!", Toast.LENGTH_SHORT).show();
+                        findViewById(R.id.send_button).setVisibility(View.GONE); // Hide send button after sending
+                    });
+                } else {
+                    runOnUiThread(() -> Toast.makeText(this, "Failed to send text", Toast.LENGTH_SHORT).show());
+                }
+
+                connection.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }).start();
+    }
+
 }
